@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EpannRouter AI<% if (title) { %> - <% title %><% } %></title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/glass.css">
+  <script defer src="/main.js"></script>
+</head>
+<body>
+  <!-- Background shapes -->
+  <div class="body-bg-shapes">
+    <div class="shape shape-1"></div>
+    <div class="shape shape-2"></div>
+    <div class="shape shape-3"></div>
+    <div class="shape shape-4"></div>
+  </div>
+
+  <!-- Navbar -->
+  <nav class="navbar">
+    <a href="/dashboard" class="logo">
+      <div class="logo-icon">🤖</div>
+      <span class="logo-text">EpannRouter AI</span>
+    </a>
+    <div class="nav-links">
+      <a href="/dashboard" class="<% if (currentPage === 'dashboard') print('active') %>"><span>📊</span> Dashboard</a>
+      <a href="/explore" class="<% if (currentPage === 'explore') print('active') %>"><span>🔍</span> Explore</a>
+      <a href="/playground" class="<% if (currentPage === 'playground') print('active') %>"><span>💬</span> Playground</a>
+      <a href="/usage" class="<% if (currentPage === 'usage') print('active') %>"><span>📈</span> Usage</a>
+      <a href="/billing" class="<% if (currentPage === 'billing') print('active') %>"><span>💳</span> Billing</a>
+      <a href="/settings" class="<% if (currentPage === 'settings') print('active') %>"><span>⚙️</span> Settings</a>
+      <a href="/profile" class="<% if (currentPage === 'profile') print('active') %>"><span>👤</span> Profile</a>
+      <a href="/docs" class="<% if (currentPage === 'docs') print('active') %>"><span>📚</span> Docs</a>
+    </div>
+    <div class="auth-buttons">
+      <% if (isAuthenticated) { %>
+        <div class="user-info" style="display:flex;align-items:center;gap:8px;">
+          <div class="avatar"><%= currentUser.name.charAt(0).toUpperCase() %></div>
+          <span style="font-size:0.85rem; font-weight:600;"><%= currentUser.name %></span>
+          <a href="/auth/logout" class="btn btn-ghost btn-sm">Logout</a>
+        </div>
+      <% } else { %>
+        <a href="/auth/login" class="btn btn-ghost">Login</a>
+        <a href="/auth/register" class="btn btn-primary">Sign Up</a>
+      <% } %>
+    </div>
+    <button class="mobile-toggle" onclick="toggleMobileNav()">
+      <span style="font-size:20px;">☰</span>
+    </button>
+  </nav>
+
+  <!-- Main layout -->
+  <div class="main-container">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <a href="/dashboard">
+          <div class="icon">🤖</div>
+          <span>EpannRouter AI</span>
+        </a>
+      </div>
+      <nav>
+        <a href="/dashboard" class="<% if (currentPage === 'dashboard') print('active') %>"><span>📊</span> Dashboard</a>
+        <a href="/explore" class="<% if (currentPage === 'explore') print('active') %>"><span>🔍</span> Explore Models</a>
+        <a href="/playground" class="<% if (currentPage === 'playground') print('active') %>"><span>💬</span> Playground</a>
+        <a href="/usage" class="<% if (currentPage === 'usage') print('active') %>"><span>📈</span> Usage</a>
+        <a href="/billing" class="<% if (currentPage === 'billing') print('active') %>"><span>💳</span> Billing</a>
+        <a href="/settings" class="<% if (currentPage === 'settings') print('active') %>"><span>⚙️</span> Settings</a>
+        <a href="/profile" class="<% if (currentPage === 'profile') print('active') %>"><span>👤</span> Profile</a>
+        <a href="/docs" class="<% if (currentPage === 'docs') print('active') %>"><span>📚</span> Documentation</a>
+      </nav>
+      <% if (isAuthenticated) { %>
+        <div class="sidebar-footer">
+          <div class="user-info">
+            <div class="avatar"><%= currentUser.name.charAt(0).toUpperCase() %></div>
+            <div class="details">
+              <span class="name"><%= currentUser.name %></span>
+              <span class="email"><%= currentUser.email %></span>
+            </div>
+          </div>
+        </div>
+      <% } %>
+    </aside>
+
+    <!-- Content -->
+    <main class="content">
+      <%= body %>
+    </main>
+  </div>
+
+  <!-- Toast container -->
+  <div id="toast-container"></div>
+
+  <script>
+    // Toast function
+    function showToast(message, type = 'info') {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      toast.className = 'toast ' + type;
+      const icon = type === 'success' ? '✅' : type === 'error' ? '❌' : 'ℹ️';
+      toast.innerHTML = '<span class="toast-icon">' + icon + '</span><span class="toast-message">' + message + '</span>';
+      container.appendChild(toast);
+      setTimeout(() => toast.remove(), 3000);
+    }
+
+    // Mobile nav toggle
+    function toggleMobileNav() {
+      const nav = document.querySelector('.nav-links');
+      if (nav) {
+        nav.style.display = nav.style.display === 'flex' ? 'none' : 'flex';
+      }
+    }
+
+    // Active link
+    document.querySelectorAll('.nav-links a, .sidebar nav a').forEach(link => {
+      link.addEventListener('click', function(e) {
+        document.querySelectorAll('.nav-links a, .sidebar nav a').forEach(l => l.classList.remove('active'));
+        this.classList.add('active');
+      });
+    });
+
+    // Form validation
+    function validateEmail(email) {
+      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    }
+
+    // Loading spinner
+    function setLoading(btn, text) {
+      btn.classList.add('btn-loading');
+      const original = btn.innerHTML;
+      btn.innerHTML = text || 'Processing...';
+      return () => {
+        btn.classList.remove('btn-loading');
+        btn.innerHTML = original;
+      };
+    }
+
+    // Confirm delete
+    function confirmDelete(message) {
+      return confirm(message);
+    }
+  </script>
+</body>
+</html>
