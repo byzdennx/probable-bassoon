@@ -1,0 +1,177 @@
+<div>
+  <div class="content-header">
+    <h1>💳 Billing</h1>
+    <p>Manage your subscription and payment methods.</p>
+  </div>
+
+  <!-- Plan Cards -->
+  <div class="models-grid">
+    <div class="model-card <%= userPlan === 'free' ? 'selected' : '' %>">
+      <div class="model-header">
+        <div class="model-icon" style="background: rgba(34,197,94,0.15); color: #22c55e;">🆓</div>
+        <div class="model-info">
+          <span class="model-name">Free Plan</span>
+          <span class="model-provider">Starter</span>
+        </div>
+      </div>
+      <div class="model-body">
+        <p style="font-size:0.85rem; color: var(--text-secondary);">Perfect for trying out EpannRouter AI with basic models and limited usage.</p>
+      </div>
+      <div class="model-footer">
+        <span class="model-price">$0<span class="price-unit">/month</span></span>
+        <span class="model-context">10 messages/day</span>
+      </div>
+      <% if (userPlan !== 'free') { %>
+        <div style="margin-top: 12px; text-align:center;">
+          <button class="btn btn-outline btn-sm" onclick="updatePlan('free')">Switch to Free</button>
+        </div>
+      <% } else { %>
+        <div style="margin-top: 12px; text-align:center;">
+          <button class="btn btn-primary btn-sm" onclick="updatePlan('pro')">Upgrade to Pro</button>
+        </div>
+      <% } %>
+    </div>
+
+    <div class="model-card <%= userPlan === 'pro' ? 'selected' : '' %>">
+      <div class="model-header">
+        <div class="model-icon" style="background: var(--primary-glow); color: var(--primary);">🚀</div>
+        <div class="model-info">
+          <span class="model-name">Pro Plan</span>
+          <span class="model-provider">Popular</span>
+        </div>
+      </div>
+      <div class="model-body">
+        <p style="font-size:0.85rem; color: var(--text-secondary);">Unlimited messages, access to all models, and priority support for serious users.</p>
+      </div>
+      <div class="model-footer">
+        <span class="model-price">$29<span class="price-unit">/month</span></span>
+        <span class="model-context">Unlimited messages</span>
+      </div>
+      <% if (userPlan === 'pro') { %>
+        <div style="margin-top: 12px; text-align:center;">
+          <button class="btn btn-primary btn-sm" disabled>Current Plan</button>
+        </div>
+      <% } else { %>
+        <div style="margin-top: 12px; text-align:center;">
+          <button class="btn btn-secondary btn-sm" onclick="updatePlan('pro')">Upgrade to Pro</button>
+        </div>
+      <% } %>
+    </div>
+
+    <div class="model-card <%= userPlan === 'enterprise' ? 'selected' : '' %>">
+      <div class="model-header">
+        <div class="model-icon" style="background: var(--accent-glow); color: var(--accent);">👑</div>
+        <div class="model-info">
+          <span class="model-name">Enterprise</span>
+          <span class="model-provider">Business</span>
+        </div>
+      </div>
+      <div class="model-body">
+        <p style="font-size:0.85rem; color: var(--text-secondary);">Custom integrations, dedicated support, SLA, and advanced security features.</p>
+      </div>
+      <div class="model-footer">
+        <span class="model-price">$99<span class="price-unit">/month</span></span>
+        <span class="model-context">Unlimited + more</span>
+      </div>
+      <% if (userPlan === 'enterprise') { %>
+        <div style="margin-top: 12px; text-align:center;">
+          <button class="btn btn-primary btn-sm" disabled>Current Plan</button>
+        </div>
+      <% } else { %>
+        <div style="margin-top: 12px; text-align:center;">
+          <button class="btn btn-secondary btn-sm" onclick="updatePlan('enterprise')">Contact Sales</button>
+        </div>
+      <% } %>
+    </div>
+  </div>
+
+  <!-- Billing History -->
+  <div class="glass" style="margin-top: 32px;">
+    <div class="glass-header">
+      <h2 style="font-size: 1.2rem; font-weight: 600;">Billing History</h2>
+    </div>
+    <div class="glass-body">
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Plan</th>
+              <th>Amount</th>
+              <th>Status</th>
+              <th>Date</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Pro Plan</td>
+              <td>$29.00</td>
+              <td><span class="badge badge-active">Active</span></td>
+              <td>Jan 15, 2025</td>
+              <td><button class="btn btn-sm btn-outline">Invoice</button></td>
+            </tr>
+            <tr>
+              <td>Free Plan</td>
+              <td>$0.00</td>
+              <td><span class="badge badge-free">Completed</span></td>
+              <td>Jan 1, 2025</td>
+              <td><button class="btn btn-sm btn-outline">Invoice</button></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  async function updatePlan(plan) {
+    if (plan === 'enterprise') {
+      showToast('Contact sales to upgrade to Enterprise', 'info');
+      return;
+    }
+    const btn = event.currentTarget;
+    const setLoading = setLoading(btn, 'Updating...');
+    try {
+      const res = await fetch('/billing/plan', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ plan })
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        showToast(data.error || 'Failed to update plan', 'error');
+        return;
+      }
+      location.reload();
+    } catch (err) {
+      showToast('An error occurred', 'error');
+    } finally {
+      setLoading();
+    }
+  }
+
+  async function cancelPlan() {
+    if (!confirm('Are you sure you want to cancel your subscription?')) return;
+    const btn = event.currentTarget;
+    const setLoading = setLoading(btn, 'Canceling...');
+    try {
+      const res = await fetch('/billing/cancel', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({})
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        showToast(data.error || 'Failed to cancel', 'error');
+        return;
+      }
+      showToast('Subscription canceled. You will keep access until end of billing cycle.', 'success');
+      location.reload();
+    } catch (err) {
+      showToast('An error occurred', 'error');
+    } finally {
+      setLoading();
+    }
+  }
+</script>
