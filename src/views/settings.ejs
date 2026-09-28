@@ -1,0 +1,182 @@
+<div>
+  <div class="content-header">
+    <h1>⚙️ Settings</h1>
+    <p>Manage your account settings and preferences.</p>
+  </div>
+
+  <div class="glass" style="max-width: 600px; margin-bottom: 24px;">
+    <div class="glass-header">
+      <h2 style="font-size: 1.2rem; font-weight: 600;">Account Settings</h2>
+    </div>
+    <div class="glass-body">
+      <form id="settingsForm">
+        <div class="form-group">
+          <label>Full Name</label>
+          <input type="text" name="name" value="<%= user.name %>" required>
+        </div>
+        <div class="form-group">
+          <label>Email</label>
+          <input type="email" name="email" value="<%= user.email %>" required>
+        </div>
+        <div class="form-group">
+          <label>Notification Preferences</label>
+          <select name="notifications">
+            <option value="all" <%= (user.notifications === 'all' || !user.notifications) ? 'selected' : '' %>>All notifications</option>
+            <option value="email" <%= user.notifications === 'email' ? 'selected' : '' %>>Email only</option>
+            <option value="none" <%= user.notifications === 'none' ? 'selected' : '' %>>No notifications</option>
+          </select>
+        </div>
+        <button type="submit" class="btn btn-primary">Save Changes</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="glass" style="max-width: 600px; margin-bottom: 24px;">
+    <div class="glass-header">
+      <h2 style="font-size: 1.2rem; font-weight: 600;">Change Password</h2>
+    </div>
+    <div class="glass-body">
+      <form id="passwordForm">
+        <div class="form-group">
+          <label>Old Password</label>
+          <input type="password" name="oldPassword" required>
+        </div>
+        <div class="form-group">
+          <label>New Password</label>
+          <input type="password" name="newPassword" required minlength="6">
+        </div>
+        <div class="form-group">
+          <label>Confirm New Password</label>
+          <input type="password" name="confirmPassword" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Change Password</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="glass" style="max-width: 600px; margin-bottom: 24px;">
+    <div class="glass-header">
+      <h2 style="font-size: 1.2rem; font-weight: 600;">API Keys</h2>
+    </div>
+    <div class="glass-body">
+      <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom: 16px;">
+        <p style="color: var(--text-secondary);">Manage your API keys for programmatic access.</p>
+        <button class="btn btn-primary btn-sm" onclick="generateApiKey()">🔑 Generate New Key</button>
+      </div>
+      <div id="apiKeysList">
+        <p style="color: var(--text-muted);">No API keys yet. Generate one to get started.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="glass" style="max-width: 600px;">
+    <div class="glass-header">
+      <h2 style="font-size: 1.2rem; font-weight: 600; color: #ef4444;">Destructive Actions</h2>
+    </div>
+    <div class="glass-body">
+      <div style="border: 1px solid rgba(239,68,68,0.3); border-radius: var(--radius-sm); padding: 20px; background: rgba(239,68,68,0.05);">
+        <p style="color: #ef4444; font-size: 0.85rem; margin-bottom: 12px;">Deleting your account is permanent and cannot be undone.</p>
+        <button class="btn btn-danger btn-sm" onclick="if(confirm('Are you sure you want to delete your account? This action cannot be undone.')) deleteAccount()">🗑️ Delete Account</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.getElementById('settingsForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const btn = this.querySelector('button');
+    const setLoading = setLoading(btn, 'Saving...');
+    try {
+      const res = await fetch('/settings/update', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: this.name.value, email: this.email.value, notifications: this.notifications.value })
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        showToast(data.error || 'Failed to update', 'error');
+        return;
+      }
+      showToast('Settings saved successfully!', 'success');
+      location.href = '/profile';
+    } catch (err) {
+      showToast('An error occurred', 'error');
+    } finally {
+      setLoading();
+    }
+  });
+
+  document.getElementById('passwordForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const btn = this.querySelector('button');
+    const setLoading = setLoading(btn, 'Updating...');
+    try {
+      const res = await fetch('/settings/password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ oldPassword: this.oldPassword.value, newPassword: this.newPassword.value })
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        showToast(data.error || 'Failed to change password', 'error');
+        return;
+      }
+      showToast('Password changed successfully!', 'success');
+      this.reset();
+    } catch (err) {
+      showToast('An error occurred', 'error');
+    } finally {
+      setLoading();
+    }
+  });
+
+  async function generateApiKey() {
+    const btn = event.currentTarget;
+    const setLoading = setLoading(btn, 'Generating...');
+    try {
+      const res = await fetch('/settings/api-key', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        showToast(data.error || 'Failed to generate key', 'error');
+        return;
+      }
+      showToast('API key generated: ' + data.key.substring(0, 16) + '...', 'success');
+      loadApiKeys();
+    } catch (err) {
+      showToast('An error occurred', 'error');
+    } finally {
+      setLoading();
+    }
+  }
+
+  async function loadApiKeys() {
+    // In a real app, fetch from endpoint
+    document.getElementById('apiKeysList').innerHTML = '<p style="color: var(--text-muted);">No API keys yet. Generate one to get started.</p>';
+  }
+
+  async function deleteAccount() {
+    const btn = event.currentTarget;
+    const setLoading = setLoading(btn, 'Deleting...');
+    try {
+      const res = await fetch('/profile/delete', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        showToast(data.error || 'Failed to delete account', 'error');
+        return;
+      }
+      showToast('Account deleted successfully', 'success');
+      location.href = '/auth/login';
+    } catch (err) {
+      showToast('An error occurred', 'error');
+    } finally {
+      setLoading();
+    }
+  }
+</script>
