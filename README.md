@@ -43,7 +43,7 @@ npm install
 ```Bash
 cp .env.example .env
 ```
-Edit .env with your configuration:
+Edit ```.env``` with your configuration:
 - PostgreSQL connection string
 - Redis connection string
 - JWT secret
@@ -82,30 +82,28 @@ const { hashPassword } = require('./src/utils/helpers');
 ```
 
 ## Usage
-Sign up at /register or log in at /login
-Explore models at /explore
-Start chatting at /playground
-Track usage at /usage
-Manage billing at /billing
-Configure settings at /settings
+- Sign up at /register or log in at /login
+- Explore models at /explore
+- Start chatting at /playground
+- Track usage at /usage
+- Manage billing at /billing
+- Configure settings at /settings
 
 ## API Endpoints
 Method	Endpoint	Description
-POST	/auth/login	Login
-POST	/auth/register	Register
-GET	/auth/logout	Logout
-GET	/dashboard	Dashboard
-GET	/explore	Explore models
-POST	/playground/chat	Chat with AI
-GET	/usage	Usage stats
-GET	/billing	Billing
-POST	/settings/update	Update settings
+- ```POST```	```/auth/login```	Login
+- ```POST```	```/auth/register```	Register
+- ```GET```	```/auth/logout```	Logout
+- ```GET```	```/dashboard```	Dashboard
+- ```GET```	```/explore```	Explore models
+- ```POST```	```/playground/chat```	Chat with AI
+- ```GET```	```/usage```	Usage stats
+- ```GET```	```/billing```	Billing
+- ```POST```	```/settings/update```	Update settings
 
 ## License
-MIT
-```text
 
----
+### MIT
 
 ## Deployment on Railway
 
@@ -134,12 +132,13 @@ railway env set SESSION_SECRET=...
 railway env set STRIPE_SECRET_KEY=...
 railway env set STRIPE_PUBLISHABLE_KEY=...
 railway env set PORT=3000
-
+```
 # Deploy
+```
 railway up
+```
 2. Database setup:
 Railway will automatically provision PostgreSQL and Redis. The application will connect using the provided connection strings.
 
 3. Run migrations:
 The application uses sequelize.sync({ force: false }) to ensure tables exist. For production, use proper migrations.
-```
