@@ -1,0 +1,89 @@
+<div>
+  <div class="content-header">
+    <h1>📈 Usage</h1>
+    <p>Track your API usage and token consumption.</p>
+  </div>
+
+  <!-- Usage Stats -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-header">
+        <span class="stat-title">Total Tokens</span>
+        <div class="stat-icon primary">🔢</div>
+      </div>
+      <div class="stat-value"><%= totalMessages %> <span class="stat-unit">tokens</span></div>
+      <div class="stat-trend">
+        <% if (plan === 'free') { %>
+          <span style="color: #f59e0b;">You have limited tokens on Free plan</span>
+        <% } else { %>
+          <span class="status-dot online"></span> Unlimited on <%= plan %>
+        <% } %>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-header">
+        <span class="stat-title">Total Sessions</span>
+        <div class="stat-icon accent">💬</div>
+      </div>
+      <div class="stat-value"><%= totalSessions %> <span class="stat-unit">sessions</span></div>
+      <div class="stat-trend up">📈 12% from last week</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-header">
+        <span class="stat-title">Avg. per Session</span>
+        <div class="stat-icon warning">📊</div>
+      </div>
+      <div class="stat-value">~150 <span class="stat-unit">tokens</span></div>
+      <div class="stat-trend">Based on recent sessions</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-header">
+        <span class="stat-title">Last Active</span>
+        <div class="stat-icon success">🕒</div>
+      </div>
+      <div class="stat-value">Today</div>
+      <div class="stat-trend">Last session 2 hours ago</div>
+    </div>
+  </div>
+
+  <!-- Usage History -->
+  <div class="glass">
+    <div class="glass-header">
+      <h2 style="font-size: 1.2rem; font-weight: 600;">Usage History</h2>
+    </div>
+    <div class="glass-body">
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Session</th>
+              <th>Model</th>
+              <th>Provider</th>
+              <th>Tokens</th>
+              <th>Duration</th>
+              <th>Date</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% if (usage && usage.length > 0) { %>
+              <% usage.forEach(s => { %>
+                <tr>
+                  <td><%= s.name %></td>
+                  <td><%= s.model %></td>
+                  <td><span class="badge badge-<%= s.provider %>"><%= s.provider %></span></td>
+                  <td><%= s.messages?.length || 0 %></td>
+                  <td>~<%= Math.round((s.messages?.length || 0) / 10) %> min</td>
+                  <td><%= new Date(s.createdAt).toLocaleDateString() %></td>
+                </tr>
+              <% }) %>
+            <% } else { %>
+              <tr>
+                <td colspan="6" style="text-align:center; color: var(--text-muted);">No usage data available</td>
+              </tr>
+            <% } %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
