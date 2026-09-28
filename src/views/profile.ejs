@@ -1,0 +1,64 @@
+<div>
+  <div class="content-header">
+    <h1>👤 Profile</h1>
+    <p>Manage your profile and view your session history.</p>
+  </div>
+
+  <!-- Profile Card -->
+  <div class="glass" style="max-width: 600px; margin-bottom: 24px;">
+    <div class="glass-header">
+      <h2 style="font-size: 1.2rem; font-weight: 600;">My Profile</h2>
+    </div>
+    <div class="glass-body" style="display:flex; align-items:center; gap: 24px;">
+      <div class="avatar" style="width: 80px; height: 80px; border-radius: 50%; background: var(--bg-gradient-2); display:flex; align-items:center; justify-content:center; font-size: 32px; font-weight: 700; color: white;">
+        <%= currentUser.name.charAt(0).toUpperCase() %>
+      </div>
+      <div>
+        <h3 style="font-weight: 700; margin-bottom: 4px;"><%= currentUser.name %></h3>
+        <p style="color: var(--text-secondary);"><%= currentUser.email %></p>
+        <div style="margin-top: 8px;">
+          <span class="badge badge-<%= currentUser.plan %>"><%= currentUser.plan.toUpperCase %> Plan</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sessions -->
+  <div class="glass">
+    <div class="glass-header">
+      <h2 style="font-size: 1.2rem; font-weight: 600;">My Sessions</h2>
+    </div>
+    <div class="glass-body">
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Model</th>
+              <th>Provider</th>
+              <th>Messages</th>
+              <th>Created</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% if (sessions && sessions.length > 0) { %>
+              <% sessions.forEach(s => { %>
+                <tr>
+                  <td><%= s.name %></td>
+                  <td><%= s.model %></td>
+                  <td><span class="badge badge-<%= s.provider %>"><%= s.provider %></span></td>
+                  <td><%= s.messages?.length || 0 %></td>
+                  <td><%= new Date(s.createdAt).toLocaleDateString() %></td>
+                </tr>
+              <% }) %>
+            <% } else { %>
+              <tr>
+                <td colspan="5" style="text-align:center; color: var(--text-muted);">No sessions yet. Start chatting in the Playground!</td>
+              </tr>
+            <% } %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
