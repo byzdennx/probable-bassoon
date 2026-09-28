@@ -1,0 +1,37 @@
+<div>
+  <div class="content-header">
+    <h1>📚 Documentation</h1>
+    <p>Everything you need to know about EpannRouter AI.</p>
+  </div>
+
+  <div class="glass" style="max-width: 800px; margin-bottom: 24px;">
+    <div class="glass-header">
+      <h2 style="font-size: 1.2rem; font-weight: 600;">
+        <%= section.title %>
+      </h2>
+    </div>
+    <div class="glass-body" style="font-size:0.9rem; line-height:1.8; color: var(--text-secondary);">
+      <%- section.content %>
+    </div>
+  </div>
+
+  <div class="glass" style="max-width: 800px;">
+    <div class="glass-header">
+      <h2 style="font-size: 1.2rem; font-weight: 600;">Quick Links</h2>
+    </div>
+    <div class="glass-body" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px;">
+      <a href="/docs?section=getting-started" class="glass" style="padding:16px; border-radius:var(--radius-sm); text-decoration:none; color: var(--text-primary); display:flex; align-items:center; gap:10px;">
+        <span>🚀</span> Getting Started
+      </a>
+      <a href="/docs?section=api-reference" class="glass" style="padding:16px; border-radius:var(--radius-sm); text-decoration:none; color: var(--text-primary); display:flex; align-items:center; gap:10px;">
+        <span>📖</span> API Reference
+      </a>
+      <a href="/docs?section=billing" class="glass" style="padding:16px; border-radius:var(--radius-sm); text-decoration:none; color: var(--text-primary); display:flex; align-items:center; gap:10px;">
+        <span>💳</span> Billing
+      </a>
+      <a href="/docs?section=faq" class="glass" style="padding:16px; border-radius:var(--radius-sm); text-decoration:none; color: var(--text-primary); display:flex; align-items:center; gap:10px;">
+        <span>❓</span> FAQ
+      </a>
+    </div>
+  </div>
+</div>
