@@ -1,0 +1,117 @@
+<div>
+  <div class="content-header">
+    <h1>📊 Dashboard</h1>
+    <p>Welcome back, <%= currentUser.name %>! Here's what's happening with your AI usage.</p>
+  </div>
+
+  <!-- Stats Grid -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-header">
+        <span class="stat-title">Total Sessions</span>
+        <div class="stat-icon primary">💬</div>
+      </div>
+      <div class="stat-value"><%= stats.totalSessions %> <span class="stat-unit">sessions</span></div>
+      <div class="stat-trend up">📈 12% from last week</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-header">
+        <span class="stat-title">Messages Sent</span>
+        <div class="stat-icon accent">✉️</div>
+      </div>
+      <div class="stat-value"><%= stats.totalMessages %> <span class="stat-unit">tokens</span></div>
+      <div class="stat-trend up">📈 8% from last week</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-header">
+        <span class="stat-title">Current Plan</span>
+        <div class="stat-icon <%= stats.plan === 'pro' ? 'success' : (stats.plan === 'enterprise' ? 'warning' : 'primary') %>">📋</div>
+      </div>
+      <div class="stat-value"><%= stats.plan.toUpperCase %> Plan</div>
+      <div class="stat-trend">
+        <% if (stats.plan === 'free') { %>
+          <span style="color: var(--text-muted);">Upgrade to Pro for unlimited messages</span>
+        <% } else if (stats.plan === 'pro') { %>
+          <span class="status-dot online"></span> Active - Unlimited
+        <% } else { %>
+          <span class="status-dot available"></span> Enterprise - All features
+        <% } %>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-header">
+        <span class="stat-title">API Keys</span>
+        <div class="stat-icon warning">🔑</div>
+      </div>
+      <div class="stat-value" id="apiKeyCount">0</div>
+      <div class="stat-trend">
+        <a href="/settings" style="color: var(--primary); font-size:0.8rem;">Manage keys</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Recent Sessions -->
+  <div class="glass" style="margin-top: 24px;">
+    <div class="glass-header">
+      <h2 style="font-size: 1.2rem; font-weight: 600;">Recent Sessions</h2>
+    </div>
+    <div class="glass-body">
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Model</th>
+              <th>Provider</th>
+              <th>Messages</th>
+              <th>Created</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% if (sessions && sessions.length > 0) { %>
+              <% sessions.forEach(s => { %>
+                <tr>
+                  <td><%= s.name %></td>
+                  <td><%= s.model %></td>
+                  <td><span class="badge badge-<%= s.provider %>"><%= s.provider %></span></td>
+                  <td><%= s.messages?.length || 0 %></td>
+                  <td><%= new Date(s.createdAt).toLocaleDateString() %></td>
+                </tr>
+              <% }) %>
+            <% } else { %>
+              <tr>
+                <td colspan="5" style="text-align:center; color: var(--text-muted);">No sessions yet. Start chatting in the Playground!</td>
+              </tr>
+            <% } %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick Actions -->
+  <div class="glass" style="margin-top: 24px; display:flex; align-items:center; justify-content:space-between; padding: 24px;">
+    <div>
+      <h3 style="font-weight: 600; margin-bottom: 4px;">Ready to chat?</h3>
+      <p style="color: var(--text-secondary); font-size: 0.9rem;">Explore AI models or start a new conversation</p>
+    </div>
+    <div style="display:flex; gap: 12px;">
+      <a href="/playground" class="btn btn-primary">💬 Start Chatting</a>
+      <a href="/explore" class="btn btn-secondary">🔍 Explore Models</a>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Fetch API key count
+  async function fetchApiKeyCount() {
+    try {
+      const res = await fetch('/settings');
+      // In a real app, you'd have a dedicated endpoint
+      document.getElementById('apiKeyCount').textContent = '0';
+    } catch (err) {
+      console.error(err);
+    }
+  }
+  fetchApiKeyCount();
+</script>
