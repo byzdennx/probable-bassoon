@@ -1,0 +1,124 @@
+<div>
+  <div class="content-header">
+    <h1>🔍 Explore Models</h1>
+    <p>Find the perfect AI model for your needs.</p>
+  </div>
+
+  <!-- Filters -->
+  <div class="filters-bar">
+    <div class="filter-group">
+      <label style="font-size:0.8rem; font-weight:600; color: var(--text-secondary);">Provider:</label>
+      <select id="providerFilter" onchange="filterModels()">
+        <option value="all" <%= selectedProvider === 'all' ? 'selected' : '' %>>All</option>
+        <option value="google" <%= selectedProvider === 'google' ? 'selected' : '' %>>Google</option>
+        <option value="openai" <%= selectedProvider === 'openai' ? 'selected' : '' %>>OpenAI</option>
+        <option value="anthropic" <%= selectedProvider === 'anthropic' ? 'selected' : '' %>>Anthropic</option>
+        <option value="meta" <%= selectedProvider === 'meta' ? 'selected' : '' %>>Meta</option>
+        <option value="mistral" <%= selectedProvider === 'mistral' ? 'selected' : '' %>>Mistral</option>
+        <option value="cohere" <%= selectedProvider === 'cohere' ? 'selected' : '' %>>Cohere</option>
+      </select>
+    </div>
+    <div class="filter-group">
+      <label style="font-size:0.8rem; font-weight:600; color: var(--text-secondary);">Price:</label>
+      <select id="priceFilter" onchange="filterModels()">
+        <option value="all" <%= selectedPrice === 'all' ? 'selected' : '' %>>All</option>
+        <option value="free" <%= selectedPrice === 'free' ? 'selected' : '' %>>Free</option>
+        <option value="cheap" <%= selectedPrice === 'cheap' ? 'selected' : '' %>>Cheap</option>
+        <option value="expensive" <%= selectedPrice === 'expensive' ? 'selected' : '' %>>Premium</option>
+      </select>
+    </div>
+    <div class="filter-group">
+      <label style="font-size:0.8rem; font-weight:600; color: var(--text-secondary);">Speed:</label>
+      <select id="speedFilter" onchange="filterModels()">
+        <option value="all" <%= selectedSpeed === 'all' ? 'selected' : '' %>>All</option>
+        <option value="fast" <%= selectedSpeed === 'fast' ? 'selected' : '' %>>Fast</option>
+        <option value="medium" <%= selectedSpeed === 'medium' ? 'selected' : '' %>>Medium</option>
+        <option value="slow" <%= selectedSpeed === 'slow' ? 'selected' : '' %>>Slow</option>
+      </select>
+    </div>
+    <div class="filter-group">
+      <label style="font-size:0.8rem; font-weight:600; color: var(--text-secondary);">Context:</label>
+      <select id="contextFilter" onchange="filterModels()">
+        <option value="all" <%= selectedContext === 'all' ? 'selected' : '' %>>All</option>
+        <option value="small" <%= selectedContext === 'small' ? 'selected' : '' %>>Small</option>
+        <option value="large" <%= selectedContext === 'large' ? 'selected' : '' %>>Large</option>
+      </select>
+    </div>
+    <div class="filter-group" style="flex:1;">
+      <input type="text" id="searchFilter" placeholder="Search models..." oninput="filterModels()" style="padding:8px 16px; background:rgba(255,255,255,0.7); border:1px solid var(--glass-border); border-radius:var(--radius-sm); font-size:0.85rem; width:100%;">
+    </div>
+  </div>
+
+  <!-- Model Grid -->
+  <div class="models-grid" id="modelsGrid">
+    <% models.forEach(m => { %>
+      <div class="model-card" onclick="selectModel('<%= m.name %>')" id="modelCard_<%= m.name %>">
+        <div class="model-header">
+          <div class="model-icon" style="background: rgba(59,130,246,0.1); color: var(--primary);">🤖</div>
+          <div class="model-info">
+            <span class="model-name"><%= m.displayName %></span>
+            <span class="model-provider"><%= m.provider %></span>
+          </div>
+        </div>
+        <div class="model-body">
+          <p style="font-size:0.85rem; color: var(--text-secondary); line-height:1.5;"><%= m.description %></p>
+        </div>
+        <div class="model-footer">
+          <span class="model-price"><%= m.price === 0 ? 'Free' : '$' + m.price + '/1K'<% if (m.price > 0) { %> <span class="price-unit">per 1K tokens</span><% } %></span>
+          <span class="model-context"><%= m.contextWindow %> context</span>
+        </div>
+      </div>
+    <% }) %>
+  </div>
+
+  <div class="glass" style="margin-top: 24px; padding: 24px; text-align:center;">
+    <p style="color: var(--text-secondary);">Found <%= models.length %> models matching your criteria.</p>
+    <button class="btn btn-primary" onclick="goToPlayground()">🚀 Start with Selected Model</button>
+  </div>
+</div>
+
+<script>
+  function filterModels() {
+    const provider = document.getElementById('providerFilter').value;
+    const price = document.getElementById('priceFilter').value;
+    const speed = document.getElementById('speedFilter').value;
+    const context = document.getElementById('contextFilter').value;
+    const search = document.getElementById('searchFilter').value.toLowerCase();
+
+    const cards = document.querySelectorAll('.model-card');
+    cards.forEach(card => {
+      const name = card.querySelector('.model-name').textContent.toLowerCase();
+      const providerText = card.querySelector('.model-provider').textContent.toLowerCase();
+      const desc = card.querySelector('.model-body p').textContent.toLowerCase();
+      const priceText = card.querySelector('.model-price').textContent.toLowerCase();
+
+      let show = true;
+      if (provider !== 'all' && providerText !== provider) show = false;
+      if (price === 'free' && !priceText.includes('free')) show = false;
+      if (price === 'cheap' && !priceText.includes('0.00') && !priceText.includes('free') && priceText.includes('$') && parseFloat(priceText.replace('$','')) > 0.001) show = false;
+      if (search && !name.includes(search) && !providerText.includes(search) && !desc.includes(search)) show = false;
+      // Speed and context filters need data attributes - simplified
+      card.style.display = show ? 'block' : 'none';
+    });
+  }
+
+  function selectModel(modelName) {
+    document.querySelectorAll('.model-card').forEach(c => c.classList.remove('selected'));
+    document.getElementById('modelCard_' + modelName).classList.add('selected');
+    document.getElementById('searchFilter').value = modelName;
+    showToast('Model selected: ' + modelName, 'info');
+  }
+
+  function goToPlayground() {
+    const selected = document.querySelector('.model-card.selected');
+    if (selected) {
+      const modelName = selected.querySelector('.model-name').textContent.toLowerCase().replace(' ', '-');
+      location.href = '/playground?model=' + modelName;
+    } else {
+      showToast('Please select a model first', 'info');
+    }
+  }
+
+  // Initial filter
+  filterModels();
+</script>
