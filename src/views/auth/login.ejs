@@ -1,0 +1,58 @@
+<div class="glass" style="max-width: 480px; margin: 80px auto; border-radius: var(--radius); overflow: hidden;">
+  <div class="glass-header" style="border-radius: var(--radius) var(--radius) 0 0;">
+    <h1 style="font-size: 1.8rem; font-weight: 700; text-align: center;">Welcome Back</h1>
+    <p style="text-align: center; color: var(--text-secondary); margin-top: 4px;">Sign in to your EpannRouter AI account</p>
+  </div>
+  <div class="glass-body" style="border-radius: 0 0 var(--radius) var(--radius);">
+    <form id="loginForm" action="/auth/login" method="POST">
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" name="email" required placeholder="you@example.com" autocomplete="email">
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" name="password" required placeholder="••••••••" autocomplete="current-password">
+      </div>
+      <div class="form-group" style="display:flex; align-items:center; justify-content:space-between; margin-top: -8px; margin-bottom: 24px;">
+        <div style="display:flex; align-items:center; gap:6px;">
+          <input type="checkbox" id="remember" style="width:14px; height:14px;">
+          <label for="remember" style="font-size:0.8rem;">Remember me</label>
+        </div>
+        <a href="/auth/forgot" style="font-size:0.8rem; color: var(--primary); text-decoration:none;">Forgot password?</a>
+      </div>
+      <button type="submit" class="btn btn-primary" style="width:100%; margin-top: 8px;">Sign In</button>
+    </form>
+    <div style="text-align:center; margin-top: 20px;">
+      <p style="font-size:0.85rem; color: var(--text-secondary);">
+        Don't have an account? <a href="/auth/register" style="color: var(--primary); text-decoration:none; font-weight:600;">Sign Up</a>
+      </p>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.getElementById('loginForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const btn = this.querySelector('button');
+    const setLoading = setLoading(btn, 'Signing in...');
+
+    const formData = new FormData(this);
+    try {
+      const res = await fetch('/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams(formData)
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        showToast(data.error || 'Login failed', 'error');
+        return;
+      }
+      location.href = '/dashboard';
+    } catch (err) {
+      showToast('An error occurred', 'error');
+    } finally {
+      setLoading();
+    }
+  });
+</script>
