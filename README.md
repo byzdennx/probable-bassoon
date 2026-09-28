@@ -39,16 +39,15 @@ cd epannrouter-ai
 npm install
 ```
 
-###3. Configure environment variables
+###3 . Configure environment variables
 ```Bash
 cp .env.example .env
 ```
 Edit .env with your configuration:
-
-PostgreSQL connection string
-Redis connection string
-JWT secret
-Stripe secret key
+- PostgreSQL connection string
+- Redis connection string
+- JWT secret
+- Stripe secret key
 
 ### 4. Start database (optional with Docker)
 ```Bash
