@@ -1,0 +1,87 @@
+<div class="glass" style="max-width: 520px; margin: 80px auto; border-radius: var(--radius); overflow: hidden;">
+  <div class="glass-header" style="border-radius: var(--radius) var(--radius) 0 0;">
+    <h1 style="font-size: 1.8rem; font-weight: 700; text-align: center;">Create Account</h1>
+    <p style="text-align: center; color: var(--text-secondary); margin-top: 4px;">Start your AI journey with EpannRouter</p>
+  </div>
+  <div class="glass-body" style="border-radius: 0 0 var(--radius) var(--radius);">
+    <form id="registerForm" action="/auth/register" method="POST">
+      <div class="form-group">
+        <label>Full Name</label>
+        <input type="text" name="name" required placeholder="John Doe" autocomplete="name">
+      </div>
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" name="email" required placeholder="you@example.com" autocomplete="email">
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" name="password" required placeholder="••••••••" autocomplete="new-password" minlength="6">
+        <div class="input-error-text" id="passwordError" style="display:none;">Password must be at least 6 characters</div>
+      </div>
+      <div class="form-group">
+        <label>Confirm Password</label>
+        <input type="password" name="confirmPassword" required placeholder="••••••••" autocomplete="new-password">
+        <div class="input-error-text" id="confirmError" style="display:none;">Passwords do not match</div>
+      </div>
+      <button type="submit" class="btn btn-primary" style="width:100%; margin-top: 16px;">Create Account</button>
+    </form>
+    <div style="text-align:center; margin-top: 20px;">
+      <p style="font-size:0.85rem; color: var(--text-secondary);">
+        Already have an account? <a href="/auth/login" style="color: var(--primary); text-decoration:none; font-weight:600;">Sign In</a>
+      </p>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.getElementById('registerForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const btn = this.querySelector('button');
+    const password = this.querySelector('[name="password"]');
+    const confirm = this.querySelector('[name="confirmPassword"]');
+    const passwordError = document.getElementById('passwordError');
+    const confirmError = document.getElementById('confirmError');
+
+    // Validate password length
+    if (password.value.length < 6) {
+      passwordError.style.display = 'block';
+      password.classList.add('input-error');
+      return;
+    } else {
+      passwordError.style.display = 'none';
+      password.classList.remove('input-error');
+    }
+
+    // Validate confirm password
+    if (password.value !== confirm.value) {
+      confirmError.style.display = 'block';
+      confirm.classList.add('input-error');
+      return;
+    } else {
+      confirmError.style.display = 'none';
+      confirm.classList.remove('input-error');
+    }
+
+    const setLoading = setLoading(btn, 'Creating account...');
+
+    const formData = new FormData(this);
+    try {
+      const res = await fetch('/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams(formData)
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        showToast(data.error || 'Registration failed', 'error');
+        return;
+      }
+      showToast('Account created successfully! Welcome to EpannRouter AI!', 'success');
+      location.href = '/dashboard';
+    } catch (err) {
+      showToast('An error occurred', 'error');
+    } finally {
+      setLoading();
+    }
+  });
+</script>
